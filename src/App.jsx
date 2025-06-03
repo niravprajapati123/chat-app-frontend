@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import socket from './socket';
-import './app.css'
+import './App.css'
 function App() {
   const [username, setUsername] = useState('');
   const [tempName, setTempName] = useState('');
