@@ -10,6 +10,7 @@ function App() {
   const handleJoin = () => {
     if (tempName.trim()) {
       setUsername(tempName.trim());
+      localStorage.setItem("username" , tempName.trim())
     }
   };
 
@@ -18,10 +19,13 @@ function App() {
       const msgData = {
         message,
         sender: username,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        self: true
       };
       socket.emit('send_message', msgData);
-      setChat((prev) => [...prev, { ...msgData, self: true }]);
+
+      console.log(chat, ":chat");
+      // setChat((prev) => [...prev, { ...msgData, self: true }]);
       setMessage('');
     }
   };
@@ -56,28 +60,34 @@ function App() {
     );
   }
 
+  console.log("chat",chat);
+
+  const loginUser = localStorage.getItem("username")
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-center text-indigo-600">Welcome, {username}</h2>
 
         <div className="h-80 overflow-y-auto border border-gray-300 rounded-lg p-4 bg-gray-50 flex flex-col gap-3">
-          {chat.map((msg, i) => (
-            <div key={i} className={`flex ${msg.self ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-end gap-2 ${msg.self ? 'flex-row-reverse' : ''}`}>
+          {chat.map((msg, i) => {
+            
+            return(
+            <div key={i} className={`flex ${loginUser == msg.sender ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex items-end gap-2 ${loginUser == msg.sender ? 'flex-row-reverse' : ''}`}>
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 text-white text-sm font-bold">
                   {msg.sender.charAt(0).toUpperCase()}
                 </div>
                 <div className={`px-4 py-2 rounded-lg max-w-[75%] text-sm ${
-                  msg.self ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'
+                  loginUser == msg.sender ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'
                 }`}>
-                  <div className="font-semibold mb-1">{msg.self ? 'You' : msg.sender}</div>
+                  <div className="font-semibold mb-1">{loginUser == msg.sender ? 'You' : msg.sender}</div>
                   <div>{msg.message}</div>
                   <div className="text-xs text-right opacity-70 mt-1">{msg.timestamp}</div>
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
 
         <div className="flex gap-2">
